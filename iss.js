@@ -21,7 +21,6 @@ const fetchCoordsByIp = (ip, callback) => {
       callback(error, null);
       return;
     }
-
     // parse the returned body for convenient use
     const geoInfo = JSON.parse(body);
     // handling invalid ip by checking the success status in the returned body
@@ -57,8 +56,25 @@ const fetchISSFlyOverTimes = (coords, callback) => {
   });
 };
 
+const nextISSTimesForMyLocation = (callback) => {
+  fetchMyIp((error, ip) => {
+    if (error) {
+      console.log("Error occured when fetching IP:", error);
+      return;
+    }
+    fetchCoordsByIp(ip, (error, coords) => {
+      if (error) {
+        console.log("Error occured when fetching Geo Coordinates:", error);
+        return;
+      }
+      fetchISSFlyOverTimes(coords, callback);
+    });
+  });
+};
+
 module.exports = {
   fetchMyIp,
   fetchCoordsByIp,
-  fetchISSFlyOverTimes
+  fetchISSFlyOverTimes,
+  nextISSTimesForMyLocation
 };
