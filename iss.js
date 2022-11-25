@@ -35,12 +35,30 @@ const fetchCoordsByIp = (ip, callback) => {
     // geoCoords.latitude = geoInfo.latitude;
     // geoCoords.longitude = geoInfo.longitude;
     // use object shorthand syntax:
-    const { latitude, longitude } = geoInfo; 
+    const { latitude, longitude } = geoInfo;
     callback(null, { latitude, longitude });
+  });
+};
+
+const fetchISSFlyOverTimes = (coords, callback) => {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
+    }
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching ISS fly over times. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+    const parsedBody = JSON.parse(body);
+    const flyOverTimes = parsedBody.response;
+    callback(null, flyOverTimes);
   });
 };
 
 module.exports = {
   fetchMyIp,
-  fetchCoordsByIp
+  fetchCoordsByIp,
+  fetchISSFlyOverTimes
 };
